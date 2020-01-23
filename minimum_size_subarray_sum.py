@@ -8,4 +8,3 @@ class Solution:
                 val_sum -= nums[left]
                 left += 1
         return 0 if result == float('inf') else result
-    s
