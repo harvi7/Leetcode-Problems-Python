@@ -4,7 +4,7 @@ class Solution:
     def kClosest(self, points: List[List[int]], K: int) -> List[List[int]]:
         maxHeap = []
         for (x, y) in points:
-            dist = -(x*x + y*y)
+            dist = -(x * x + y * y)
             if len(maxHeap) == K:
                 heapq.heappushpop(maxHeap, (dist, x, y))
             else:
