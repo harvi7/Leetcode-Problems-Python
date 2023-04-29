@@ -1,25 +1,59 @@
-class Solution:
-    def canFinish(self, numCourses: int, prerequisites: List[List[int]]) -> bool:
-        inDegree = [0] * numCourses
-        count = 0
-        
-        for i in range(len(prerequisites)):
-            inDegree[prerequisites[i][0]] += 1
-        
-        stack = []
-        
-        for i in range(len(inDegree)): 
-            if inDegree[i] == 0:
-                stack.append(i)
-        
-        while stack:
-            curr = stack.pop()
-            count += 1
-            
-            for i in range(len(prerequisites)):
-                if prerequisites[i][1] == curr:
-                    inDegree[prerequisites[i][0]] -= 1
-                    if inDegree[prerequisites[i][0]] == 0:
-                        stack.append(prerequisites[i][0])   
-                        
-        return count == numCourses
+# class Solution:
+#     def canFinish(self, numCourses: int, prerequisites: List[List[int]]) -> bool:
+#         vis = [0] * numCourses
+#         digraph = collections.defaultdict(set)
+#         for dst, src in prerequisites:
+#             digraph[src].add(dst)
+
+#         def dfs(x):
+#             vis[x] = -1
+#             for y in digraph[x]:
+#                 if vis[y] < 0 or (vis[y] == 0 and not dfs(y)):
+#                     return False
+#             vis[x] = 1
+#             return True
+
+#         for i in range(numCourses):
+#             if vis[i] == 0 and not dfs(i): return False
+#         return True
+
+class GNode(object):
+    """  data structure represent a vertex in the graph."""
+    def __init__(self):
+        self.inDegrees = 0
+        self.outNodes = []
+
+class Solution(object):
+    def canFinish(self, numCourses, prerequisites):
+        """
+        :type numCourses: int
+        :type prerequisites: List[List[int]]
+        :rtype: bool
+        """
+        from collections import defaultdict, deque
+        graph = defaultdict(GNode)
+
+        totalDeps = 0
+        for relation in prerequisites:
+            nextCourse, prevCourse = relation[0], relation[1]
+            graph[prevCourse].outNodes.append(nextCourse)
+            graph[nextCourse].inDegrees += 1
+            totalDeps += 1
+
+        nodepCourses = deque()
+        for index, node in graph.items():
+            if node.inDegrees == 0:
+                nodepCourses.append(index)
+
+        removedEdges = 0
+        while nodepCourses:
+            course = nodepCourses.pop()
+
+            for nextCourse in graph[course].outNodes:
+                graph[nextCourse].inDegrees -= 1
+                removedEdges += 1
+   
+                if graph[nextCourse].inDegrees == 0:
+                    nodepCourses.append(nextCourse)
+
+        return True if removedEdges == totalDeps else False
